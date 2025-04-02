@@ -1,0 +1,6 @@
+fastapi
+httpx
+openai
+pydantic
+sse_starlette
+uvicorn
