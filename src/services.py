@@ -52,6 +52,7 @@ async def create_completion_stream(
             CHAT_URL.format(chat_request.chat_id),
             json=body,
             headers=headers,
+            timeout=60,
         ) as response:
             async for chunk in process_response_stream(response, chat_request.chat_model_id):
                 yield chunk
