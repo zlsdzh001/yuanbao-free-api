@@ -1,6 +1,7 @@
+beautifulsoup4
 fastapi
 httpx
-openai
 pydantic
+Requests
 sse_starlette
 uvicorn

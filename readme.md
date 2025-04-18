@@ -63,6 +63,8 @@ docker run -d -p 8000:8000 --name yuanbao-api yuanbao-free-api
 
 - `hy_user`、`agent_id` 和 `hy_token`（用于认证）需要从元宝网站获取。
 
+##### 手动获取
+
 ![Token获取方法](example.png)
 
 1. 登录 [腾讯元宝网站](https://yuanbao.tencent.com/)
@@ -70,6 +72,17 @@ docker run -d -p 8000:8000 --name yuanbao-api yuanbao-free-api
 3. 在网络请求中找到对话请求，查看请求头中的 Cookie
 4. 从 Cookie 中提取 `hy_user`、`hy_token` 值
 5. 从请求中提取 `agent_id`
+
+##### 自动获取
+
+```shell
+python get_cookies.py
+```
+
+1. 运行 `get_cookies.py`
+2. 扫码登录
+3. 输出 `hy_user`、`agent_id` 和 `hy_token`
+
 
 #### 使用 OpenAI SDK 调用
 
