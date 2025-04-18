@@ -14,11 +14,11 @@ from src.schemas import (
 )
 
 
-def get_model_info(model_name: str):
+def get_model_info(model_name: str) -> Optional[Dict]:
     return MODEL_MAPPING.get(model_name.lower(), None)
 
 
-def parse_messages(messages: List[Message]):
+def parse_messages(messages: List[Message]) -> str:
     only_user_message = True
     for m in messages:
         if m.role == "user":
@@ -75,7 +75,10 @@ async def process_response_stream(response: httpx.Response, model_id: str) -> As
         elif status == CHUNK_TYPE.REASONER:
             yield _create_chunk(f"[{status}]" + chunk_data["content"])
         elif status == CHUNK_TYPE.SEARCH_WITH_TEXT:
-            docs = [{"url": doc["url"], "title": doc["title"]} for doc in chunk_data.get("docs", [])]
+            docs = [
+                {"url": doc["url"], "title": doc["title"], "publish_time": doc["publish_time"]}
+                for doc in chunk_data.get("docs", [])
+            ]
             yield _create_chunk(f"[{status}]" + json.dumps(docs, ensure_ascii=False))
         if status == CHUNK_TYPE.STATUS:
             yield _create_chunk(f"[{status}]" + chunk_data["msg"])

@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import Depends, FastAPI
@@ -9,6 +10,13 @@ from src.schemas import ChatCompletionRequest, YuanBaoChatCompletionRequest
 from src.services import create_completion_stream, create_conversation
 from src.utils import generate_headers, get_model_info, parse_messages
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -19,6 +27,7 @@ HTTP_STATUS_ERROR = 500
 
 
 def error_response(status_code: int, message: str) -> JSONResponse:
+    logger.error(f"Error {status_code}: {message}")
     return JSONResponse(
         status_code=status_code,
         content={"status": status_code, "message": message},
@@ -35,11 +44,10 @@ async def chat_completions(
 
         token = authorization.credentials
         headers = generate_headers(request, token)
-        if request.chat_id is None or request.chat_id == "":
-            try:
-                request.chat_id = await create_conversation(request.agent_id, headers)
-            except Exception as e:
-                return error_response(HTTP_STATUS_BAD_REQUEST, f"create conversation failed: {str(e)}")
+
+        if not request.chat_id:
+            request.chat_id = await create_conversation(request.agent_id, headers)
+            logger.info(f"Conversation created with chat_id: {request.chat_id}")
 
         prompt = parse_messages(request.messages)
         model_info = get_model_info(request.model)
@@ -51,13 +59,12 @@ async def chat_completions(
             support_functions=model_info["support_functions"],
         )
 
-        try:
-            generator = create_completion_stream(chat_request, headers, request.should_remove_conversation)
-            return EventSourceResponse(generator, media_type="text/event-stream")
-        except Exception as e:
-            return error_response(HTTP_STATUS_BAD_REQUEST, f"stream generation failed: {str(e)}")
+        generator = create_completion_stream(chat_request, headers, request.should_remove_conversation)
+        logger.info(f"Stream generation started for chat_id={request.chat_id}")
+        return EventSourceResponse(generator, media_type="text/event-stream")
 
     except Exception as e:
+        logger.error(f"Internal server error: {str(e)}", exc_info=True)
         return error_response(HTTP_STATUS_ERROR, f"internal server error: {str(e)}")
 
 
