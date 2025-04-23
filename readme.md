@@ -1,91 +1,64 @@
-# YuanBao-Free-API
+# YuanBao-Free-API ✨
 
-YuanBao-Free-API 是一个允许您通过 OpenAI 兼容接口访问腾讯元宝大模型的服务。该项目包含服务端和客户端两部分，可以让您轻松地将腾讯元宝大模型集成到您的应用中。
+一个允许您通过 OpenAI 兼容接口访问腾讯元宝的服务。
 
-## 功能特点
+## ✨ 核心特性
 
-- 提供 OpenAI 兼容的 API 接口
-- 支持多种元宝模型（deepseek-v3, deepseek-r1, hunyuan 等）
-- 支持流式输出（Streaming）
-- 支持网络搜索功能
-- 简单易用的客户端示例
+✅ **完整兼容 OpenAI API 规范**  
+🚀 **支持主流元宝大模型**（DeepSeek/HunYuan系列）  
+⚡️ **流式输出 & 网络搜索功能**  
+📦 **开箱即用的部署方案**（本地/Docker）  
 
-## 注意事项
+## ⚠️ 使用须知
 
-- **本项目仅供学习和研究使用**
-- **请遵守腾讯元宝的使用条款和条件**
-- `hy_token` 有时效性，过期后需要重新获取
+- 本项目仅限**学习研究用途**
+- 请严格遵守腾讯元宝的[使用条款](https://yuanbao.tencent.com/)
+- `hy_token` 有时效性，过期需重新获取
 
-## 安装
+## 🚀 快速开始
 
-1. 克隆仓库
-
+### 环境准备
 ```bash
 git clone https://github.com/chenwr727/yuanbao-free-api.git
 cd yuanbao-free-api
-```
-
-2. 安装依赖
-
-```bash
 pip install -r requirements.txt
 ```
 
-## 使用方法
+## 🖥️ 服务端部署
 
-### 启动服务端
-
-#### 本地部署
-
+### 本地运行
 ```bash
+# 服务地址：http://localhost:8000
 python app.py
 ```
 
-服务将在 `http://localhost:8000` 启动。
-
-#### Docker 部署
-
-##### 构建镜像
-
+### Docker部署
 ```bash
+# 构建镜像
 docker build -t yuanbao-free-api .
-```
 
-##### 运行容器
-
-```bash
+# 运行容器
 docker run -d -p 8000:8000 --name yuanbao-api yuanbao-free-api
 ```
 
-### 客户端
+## 📡 客户端调用
 
-#### 参数获取
-
-- `hy_user`、`agent_id` 和 `hy_token`（用于认证）需要从元宝网站获取。
-
-##### 手动获取
-
+### 认证参数获取
+#### 手动获取
 ![Token获取方法](example.png)
+1. 访问[腾讯元宝](https://yuanbao.tencent.com/)
+2. 打开开发者工具（F12）
+3. 捕获对话请求获取：
+   - Cookie中的 `hy_user` 和 `hy_token`
+   - 请求体中的 `agent_id`
 
-1. 登录 [腾讯元宝网站](https://yuanbao.tencent.com/)
-2. 打开浏览器开发者工具（F12）
-3. 在网络请求中找到对话请求，查看请求头中的 Cookie
-4. 从 Cookie 中提取 `hy_user`、`hy_token` 值
-5. 从请求中提取 `agent_id`
-
-##### 自动获取
-
-```shell
+#### 自动获取
+```bash
+# 扫码登录后自动输出认证参数
 python get_cookies.py
 ```
 
-1. 运行 `get_cookies.py`
-2. 扫码登录
-3. 输出 `hy_user`、`agent_id` 和 `hy_token`
-
-
-#### 使用 OpenAI SDK 调用
-
+### API调用示例
 ```python
 from openai import OpenAI
 
@@ -111,23 +84,33 @@ for chunk in response:
     print(chunk.choices[0].delta.content or "")
 ```
 
-## 支持的模型
+## 🧠 支持模型
 
-目前支持以下模型：
+| 模型名称              | 特性说明                    |
+|----------------------|-----------------------------|
+| deepseek-v3          | 深度求索 V3 基础模型         |
+| deepseek-r1          | 深度求索 R1 增强模型         |
+| deepseek-v3-search   | 深度求索 V3 模型（带搜索功能）|
+| deepseek-r1-search   | 深度求索 R1 模型（带搜索功能）|
+| hunyuan              | 腾讯混元基础模型             |
+| hunyuan-t1           | 腾讯混元 T1 模型             |
+| hunyuan-search       | 腾讯混元模型（带搜索功能）    |
+| hunyuan-t1-search    | 腾讯混元 T1 模型（带搜索功能）|
 
-- `deepseek-v3`：深度求索 V3 模型
-- `deepseek-r1`：深度求索 R1 模型
-- `deepseek-v3-search`：带搜索功能的深度求索 V3 模型
-- `deepseek-r1-search`：带搜索功能的深度求索 R1 模型
-- `hunyuan`：腾讯混元模型
-- `hunyuan-t1`：腾讯混元 T1 模型
-- `hunyuan-search`：带搜索功能的腾讯混元模型
-- `hunyuan-t1-search`：带搜索功能的腾讯混元 T1 模型
+## 🌟 应用案例
 
-## 许可证
+[FinVizAI](https://github.com/chenwr727/FinVizAI) 实现多步骤金融分析工作流：
+- 实时资讯搜索分析
+- 市场趋势数据集成
+- 结构化报告生成
 
-MIT
+## 📜 开源协议
 
-## 贡献
+MIT License © 2025
 
-欢迎提交 Issues 和 Pull Requests！
+## 🤝 参与贡献
+
+欢迎通过以下方式参与项目：
+1. 提交Issue报告问题
+2. 创建Pull Request贡献代码
+3. 分享你的集成案例
