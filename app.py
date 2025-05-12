@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI
 
-from src.routers import chat, upload
+from src.routers import chat, upload, recentChat
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,6 +15,7 @@ app = FastAPI(title="YuanBao API Proxy", version="1.0.0")
 
 app.include_router(chat.router)
 app.include_router(upload.router)
+app.include_router(recentChat.router)
 
 if __name__ == "__main__":
     import uvicorn

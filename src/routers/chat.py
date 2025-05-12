@@ -8,6 +8,7 @@ from src.schemas.chat import ChatCompletionRequest, YuanBaoChatCompletionRequest
 from src.services.chat.completion import create_completion_stream
 from src.services.chat.conversation import create_conversation
 from src.utils.chat import get_model_info, parse_messages
+from src.routers.recentChat import ShareChat
 
 router = APIRouter()
 
@@ -21,6 +22,8 @@ async def chat_completions(
         if not request.chat_id:
             request.chat_id = await create_conversation(request.agent_id, headers)
             logging.info(f"Conversation created with chat_id: {request.chat_id}")
+            if not request.should_remove_conversation:
+                ShareChat[request.hy_user] = request.chat_id
 
         prompt = parse_messages(request.messages)
         model_info = get_model_info(request.model)
@@ -34,6 +37,7 @@ async def chat_completions(
             chat_model_id=model_info["model"],
             multimedia=request.multimedia,
             support_functions=model_info.get("support_functions"),
+            project_id=request.project_id
         )
 
         generator = create_completion_stream(chat_request, headers, request.should_remove_conversation)
