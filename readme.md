@@ -66,7 +66,7 @@ import base64
 import requests
 from openai import OpenAI
 
-base_url = "http://localhost:5050/v1/"
+base_url = "http://localhost:8000/v1/"
 
 hy_source = "web"
 hy_user = ""    # 替换为你的用户ID
@@ -75,7 +75,7 @@ hy_token = ""   # 替换为你的token
 agent_id = "naQivTmsDa"
 chat_id = ""    # 可选，如果不提供会自动创建
 
-# upload
+# upload，可选
 url = base_url + "upload"
 
 file_name = "example.png"
