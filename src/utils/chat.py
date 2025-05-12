@@ -5,13 +5,7 @@ from typing import AsyncGenerator, Dict, List, Optional
 import httpx
 
 from src.const import CHUNK_TYPE, MODEL_MAPPING
-from src.schemas import (
-    ChatCompletionChunk,
-    ChatCompletionRequest,
-    Choice,
-    ChoiceDelta,
-    Message,
-)
+from src.schemas.chat import ChatCompletionChunk, Choice, ChoiceDelta, Message
 
 
 def get_model_info(model_name: str) -> Optional[Dict]:
@@ -29,16 +23,6 @@ def parse_messages(messages: List[Message]) -> str:
     else:
         prompt = "\n".join([f"{m.content}" for m in messages])
     return prompt
-
-
-def generate_headers(request: ChatCompletionRequest, token: str) -> Dict[str, str]:
-    return {
-        "Cookie": f"hy_source={request.hy_source}; hy_user={request.hy_user}; hy_token={token}",
-        "Origin": "https://yuanbao.tencent.com",
-        "Referer": f"https://yuanbao.tencent.com/chat/{request.agent_id}",
-        "X-Agentid": request.agent_id,
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
-    }
 
 
 async def process_response_stream(response: httpx.Response, model_id: str) -> AsyncGenerator[str, None]:

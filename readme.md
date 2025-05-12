@@ -7,6 +7,7 @@
 ✅ **完整兼容 OpenAI API 规范**  
 🚀 **支持主流元宝大模型**（DeepSeek/HunYuan系列）  
 ⚡️ **流式输出 & 网络搜索功能**  
+🖼️ **支持上传图片或文件**  
 📦 **开箱即用的部署方案**（本地/Docker）  
 
 ## ⚠️ 使用须知
@@ -60,23 +61,60 @@ python get_cookies.py
 
 ### API调用示例
 ```python
+import base64
+
+import requests
 from openai import OpenAI
 
-client = OpenAI(
-    base_url="http://localhost:8000/v1/", # 替换为服务端地址
-    api_key="your_hy_token",  # 替换为 hy_token 
-)
+base_url = "http://localhost:5050/v1/"
+
+hy_source = "web"
+hy_user = ""    # 替换为你的用户ID
+hy_token = ""   # 替换为你的token
+
+agent_id = "naQivTmsDa"
+chat_id = ""    # 可选，如果不提供会自动创建
+
+# upload
+url = base_url + "upload"
+
+file_name = "example.png"
+with open(file_name, "rb") as f:
+    file_data = base64.b64encode(f.read()).decode("utf-8")
+data = {
+    "agent_id": agent_id,
+    "hy_source": hy_source,
+    "hy_user": hy_user,
+    "file": {
+        "file_name": file_name,
+        "file_data": file_data ,
+        "file_type": "image",   # 只能是 image 或 doc
+    },
+}
+headers = {"Authorization": f"Bearer {hy_token}"}
+response = requests.post(url, json=data, headers=headers)
+if response.status_code == 200:
+    print("File uploaded successfully:", response.json())
+    multimedia = [response.json()]
+else:
+    print("File upload failed:", response.status_code, response.text)
+    multimedia = []
+print(multimedia)
+
+# chat
+client = OpenAI(base_url=base_url, api_key=hy_token)
 
 response = client.chat.completions.create(
-    model="deepseek-r1-search",  # 支持的模型见 const.py
-    messages=[{"role": "user", "content": "你是谁"}],
+    model="deepseek-v3",
+    messages=[{"role": "user", "content": "这是什么？"}],
     stream=True,
     extra_body={
-        "hy_source": "web",
-        "hy_user": "your_hy_user",  # 替换为 hy_user
-        "agent_id": "your_agent_id",  # 替换为 agent_id
-        "chat_id": "your_chat_id",  # 可选，如果不提供会自动创建
-        "should_remove_conversation": False,  # 是否在对话结束后删除会话
+        "hy_source": hy_source,
+        "hy_user": hy_user,
+        "agent_id": agent_id,
+        "chat_id": chat_id,
+        "should_remove_conversation": False,
+        "multimedia": multimedia,
     },
 )
 

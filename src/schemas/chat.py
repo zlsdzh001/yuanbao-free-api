@@ -3,6 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator
 
 from src.const import MODEL_MAPPING
+from src.schemas.common import Media
 
 
 class Message(BaseModel):
@@ -18,6 +19,7 @@ class ChatCompletionRequest(BaseModel):
     hy_source: str = "web"
     hy_user: str
     should_remove_conversation: bool = False
+    multimedia: List[Media] = []
 
     @field_validator("messages")
     def check_messages_not_empty(cls, value):
@@ -38,6 +40,7 @@ class YuanBaoChatCompletionRequest(BaseModel):
     prompt: str
     agent_id: str
     chat_model_id: str
+    multimedia: List[Media] = []
     support_functions: Optional[List[str]]
 
 
