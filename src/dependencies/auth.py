@@ -25,5 +25,7 @@ async def get_authorized_headers(
         else:
             raise HTTPException(status_code=400, detail="Unsupported Content-Type")
 
-    headers = generate_headers(data, token)
-    return headers
+        headers = generate_headers(data, token)
+        return headers
+    else:
+        return {}
