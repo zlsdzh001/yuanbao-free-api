@@ -84,7 +84,8 @@ async def create_completion_stream(
     }
     if chat_request.support_functions:
         body["supportFunctions"] = chat_request.support_functions
-
+    if chat_request.project_id is not None and chat_request.project_id != "":
+        body["projectId"] = chat_request.project_id
     try:
         async with httpx.AsyncClient() as client:
             async with client.stream(

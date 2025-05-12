@@ -18,6 +18,7 @@ class ChatCompletionRequest(BaseModel):
     hy_source: str = "web"
     hy_user: str
     should_remove_conversation: bool = False
+    project_id: str
 
     @field_validator("messages")
     def check_messages_not_empty(cls, value):
@@ -39,6 +40,7 @@ class YuanBaoChatCompletionRequest(BaseModel):
     agent_id: str
     chat_model_id: str
     support_functions: Optional[List[str]]
+    project_id: str
 
 
 class ChoiceDelta(BaseModel):
