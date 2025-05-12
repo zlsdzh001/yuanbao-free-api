@@ -15,14 +15,15 @@ async def get_authorized_headers(
     token = authorization.credentials
 
     content_type = request.headers.get("Content-Type", "")
-
-    if "application/json" in content_type:
-        data = await request.json()
-    elif "multipart/form-data" in content_type:
-        form = await request.form()
-        data = dict(form)
-    else:
-        raise HTTPException(status_code=400, detail="Unsupported Content-Type")
+    
+    if request.method == "POST":
+        if "application/json" in content_type:
+            data = await request.json()
+        elif "multipart/form-data" in content_type:
+            form = await request.form()
+            data = dict(form)
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported Content-Type")
 
     headers = generate_headers(data, token)
     return headers
