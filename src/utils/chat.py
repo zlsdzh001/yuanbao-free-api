@@ -6,7 +6,7 @@ import httpx
 
 from src.const import CHUNK_TYPE, MODEL_MAPPING
 from src.schemas.chat import ChatCompletionChunk, Choice, ChoiceDelta, Message
-
+import logging
 
 def get_model_info(model_name: str) -> Optional[Dict]:
     return MODEL_MAPPING.get(model_name.lower(), None)
@@ -52,12 +52,26 @@ async def process_response_stream(response: httpx.Response, model_id: str) -> As
 
         chunk_data: Dict = json.loads(data)
         if status == CHUNK_TYPE.TEXT:
-            if chunk_data.get("msg"):
+            if chunk_data.get("msg") and chunk_data.get("msg") != "[](@replace=1)\n":
                 yield _create_chunk(f"[{status}]" + chunk_data["msg"])
             if chunk_data.get("stopReason"):
                 finish_reason = chunk_data["stopReason"]
+            if chunk_data.get("type") and chunk_data.get("type") == "replace":
+                logging.info(f"{status}"+data)
+                outer_id = chunk_data["replace"]["id"]
+                result = []
+                for media in chunk_data["replace"]["multimedias"]:
+                    if media.get("type") and media["type"] == "loadingImage" and media.get("url"):
+                        result.append({
+                            "id": outer_id,
+                            "type": media["type"],
+                            "url": media["url"].encode('latin1').decode('unicode_escape')
+                        })
+                if len(result) > 0:
+                    yield _create_chunk("[image]" + json.dumps(result, ensure_ascii=False))
         elif status == CHUNK_TYPE.REASONER:
-            yield _create_chunk(f"[{status}]" + chunk_data["content"])
+            if chunk_data.get("content"):
+                yield _create_chunk(f"[{status}]" + chunk_data["content"])
         elif status == CHUNK_TYPE.SEARCH_WITH_TEXT:
             docs = [
                 {"url": doc["url"], "title": doc["title"], "publish_time": doc["publish_time"]}
